@@ -231,6 +231,10 @@ namespace aoc {
         auto end = std::chrono::steady_clock::now();
         return end - start;
     }
+
+    inline std::string_view to_sv(std::cmatch::const_reference r) {
+        return std::string_view(r.first, r.length());
+    }
 }
 
 namespace aoc::detail::defer {
