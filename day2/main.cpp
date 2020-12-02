@@ -9,7 +9,7 @@ struct Password {
         Password ret{};
         std::fill(ret.chars.begin(), ret.chars.end(), 0);
         for (auto ch : sv)
-            ret.chars[ch] += 1;
+            ret.chars[static_cast<size_t>(ch)] += 1;
         return ret;
     }
 };
