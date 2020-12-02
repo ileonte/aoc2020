@@ -17,6 +17,7 @@
 #include <deque>
 #include <sstream>
 #include <chrono>
+#include <regex>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
