@@ -4,8 +4,7 @@ struct Password {
     std::array<size_t, 256> chars{};
 
     static inline Password parse(std::string_view sv) {
-        while (!sv.empty() && std::isspace(*sv.begin()))
-            sv.remove_prefix(1);
+        sv = aoc::trim(sv);
 
         Password ret{};
         std::fill(ret.chars.begin(), ret.chars.end(), 0);
@@ -77,12 +76,13 @@ int main() {
     while (std::getline(std::cin, line)) {
         if (line.empty()) continue;
 
+        auto line_sv = aoc::trim(line);
         std::cmatch match{};
-        if (!std::regex_match(&*line.cbegin(), &*line.cend(), match, line_re))
+        if (!std::regex_match(line_sv.begin(), line_sv.end(), match, line_re))
             continue;
 
-        if (auto r = Policy::parse(std::string_view(match[1].first, match[1].length())); r.has_value()) {
-            auto passwd_sv = std::string_view(match[2].first, match[2].length());
+        if (auto r = Policy::parse(aoc::to_sv(match[1])); r.has_value()) {
+            auto passwd_sv = aoc::to_sv(match[2]);
             auto policy = r.value();
             auto passwd = Password::parse(passwd_sv);
             count_p1 += policy.matches_p1(passwd);
