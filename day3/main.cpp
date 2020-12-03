@@ -21,18 +21,16 @@ struct Map {
         std::string line{};
         line.reserve(1024);
         if (!std::getline(std::cin, line)) return std::nullopt;
-        auto sv = aoc::trim(line);
 
         Map res{};
-        res.width = sv.size();
+        res.width = line.size();
         res.height = 1;
         res.data.reserve(res.width * 1024);
-        res.data.insert(res.data.end(), sv.begin(), sv.end());
+        res.data.insert(res.data.end(), line.begin(), line.end());
 
         while (std::getline(std::cin, line)) {
-            sv = aoc::trim(line);
-            if (sv.size() != res.width) return std::nullopt;
-            res.data.insert(res.data.end(), sv.begin(), sv.end());
+            if (line.size() != res.width) return std::nullopt;
+            res.data.insert(res.data.end(), line.begin(), line.end());
             res.height += 1;
         }
 
