@@ -90,11 +90,6 @@ int main() {
     size_t answer_p1{0};
     size_t answer_p2{0};
 
-    process_passport_line(
-        "pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980 hcl:#623a2f",
-        field_hash,
-        valid);
-
     const auto update_counts = [&]() {
         auto fields_ok = passport_has_required_fields(field_hash);
         answer_p1 += fields_ok;
