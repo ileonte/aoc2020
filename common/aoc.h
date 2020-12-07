@@ -235,6 +235,29 @@ namespace aoc {
     inline std::string_view to_sv(std::cmatch::const_reference r) {
         return std::string_view(r.first, r.length());
     }
+
+    inline std::vector<std::string_view>
+    str_split(std::string_view the_string, const std::regex& re,
+              size_t max_splits = std::numeric_limits<size_t>::max())
+    {
+        std::vector<std::string_view> ret{};
+        max_splits = std::max(size_t(2), max_splits);
+        while (true) {
+            std::cmatch r{};
+            if (!std::regex_search(the_string.begin(), the_string.end(), r, re)) {
+                ret.push_back(the_string);
+                break;
+            }
+            ret.push_back(to_sv(r.prefix()));
+            the_string = to_sv(r.suffix());
+            if (the_string.empty()) break;
+            if (ret.size() >= max_splits - 1) {
+                ret.push_back(the_string);
+                break;
+            }
+        }
+        return ret;
+    }
 }
 
 namespace aoc::detail::defer {
