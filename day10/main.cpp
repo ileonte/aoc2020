@@ -1,15 +1,5 @@
 #include <aoc.h>
 
-static inline void recurse(const size_t* begin, const size_t* end, const size_t* current, std::map<size_t, size_t>& counts) {
-    size_t paths_forward{0};
-    for (auto it = current + 1; it <= std::min(end, current + 3); it++) {
-        if (*it - *current > 3) break;
-        paths_forward += counts[*it];
-    }
-    counts.insert({*current, paths_forward});
-    if (current > begin) recurse(begin, end, current - 1, counts);
-}
-
 int main() {
     std::string line{};
     std::vector<size_t> joltages{};
@@ -43,13 +33,15 @@ int main() {
     fmt::print("{}\n", diff_1 * diff_3);
 
     // part2
-    std::map<size_t, size_t> counts{};
-    auto begin = &joltages.front();
-    auto end = &joltages.back();
-    counts.insert({*end, size_t(0)});
-    counts.insert({*(end - 1), size_t(1)});
-    recurse(begin, end, end - 2, counts);
-    fmt::print("{}\n", counts[0]);
+    std::vector<size_t> paths_forward(joltages.size(), size_t(0));
+    paths_forward[joltages.size() - 2] = 1;
+    for (size_t current_idx = joltages.size() - 3; current_idx < joltages.size(); current_idx--) {
+        for (size_t it = current_idx + 1; it < joltages.size(); it++) {
+            if (joltages[it] - joltages[current_idx] > 3) break;
+            paths_forward[current_idx] += paths_forward[it];
+        }
+    }
+    fmt::print("{}\n", paths_forward[0]);
 
     return 0;
 }
