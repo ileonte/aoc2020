@@ -111,6 +111,20 @@ namespace fmt {
         }
     };
 
+    template <typename K, typename V>
+    struct formatter<std::map<K, V>> {
+        template <typename ParseContext>
+        constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
+
+        template <typename FormatContext>
+        auto format(const std::map<K, V>& m, FormatContext &ctx) {
+            format_to(ctx.out(), "{{");
+            for (const auto& [k, v] : m)
+                format_to(ctx.out(), "\n   {} -> {}", k, v);
+            return format_to(ctx.out(), "{}}}", m.size() ? "\n" : "");
+        }
+    };
+
     template <typename T1, typename T2>
     struct formatter<std::pair<T1, T2>> {
         template <typename ParseContext>
