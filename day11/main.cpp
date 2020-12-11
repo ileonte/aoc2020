@@ -4,9 +4,6 @@ struct Position {
     ssize_t x{0};
     ssize_t y{0};
 };
-std::ostream& operator<<(std::ostream& out, Position p) {
-    return out << "{" << p.x << ", " << p.y << "}";
-}
 
 struct Map {
     ssize_t width{0};
@@ -98,13 +95,6 @@ struct Map {
         return std::nullopt;
     }
 };
-std::ostream& operator<<(std::ostream& out, const Map& map) {
-    out << '{' << map.width << ", " << map.height << ", " << (void*)map.data.data() << "}\n";
-    for (size_t line = 0; line < map.height; line++) {
-        out << std::string_view(map.data.data() + line * map.width, map.width) << '\n';
-    }
-    return out;
-}
 
 template <bool adjacent_only, size_t occupied_threshhold>
 static inline size_t search_for_steady_state(const Map& map) {
