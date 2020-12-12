@@ -16,21 +16,6 @@ struct Map {
         {-1,  1}, { 0,   1}, { 1,  1}
     }};
 
-    Map() = default;
-    Map(const Map&) = default;
-    Map(Map&& other)
-        : width(other.width)
-        , height(other.height)
-        , data(std::move(other.data))
-    {}
-    Map& operator=(const Map&) = default;
-    Map& operator=(Map&& other) {
-        width = other.width;
-        height = other.height;
-        data = std::move(other.data);
-        return *this;
-    }
-
     static inline std::optional<Map> read() {
         std::string line{};
         line.reserve(1024);
