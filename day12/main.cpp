@@ -168,11 +168,10 @@ struct Ship2 {
                         break;
                     }
                 }
-                auto new_beacon = MovementDelta {
+                beacon = MovementDelta {
                     .dx = beacon.dx * cos - beacon.dy * sin,
                     .dy = beacon.dx * sin + beacon.dy * cos,
                 };
-                beacon = new_beacon;
                 break;
             }
             case ActionType::move_forward: {
