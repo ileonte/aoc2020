@@ -1,9 +1,12 @@
 #include <aoc.h>
 
 struct Pair {
-    size_t i{0};
-    size_t v{0};
+    size_t idx{0};
+    size_t id{0};
 };
+std::ostream& operator<<(std::ostream& out, Pair p) {
+    return out << '{' << p.idx << ", " << p.id << '}';
+}
 
 int main() {
     size_t timestamp{};
@@ -39,9 +42,15 @@ int main() {
     }
     fmt::print("{}\n", part1_id * part1_dif);
 
-    auto min = *std::min_element(ids.begin(), ids.end(), [](Pair p1, Pair p2) -> bool { return p1.v < p2.v; });
-    auto max = *std::max_element(ids.begin(), ids.end(), [](Pair p1, Pair p2) -> bool { return p1.v < p2.v; });
-    fmt::print("{} {}\n", min.v, max.v);
+    size_t inc{ids[0].id};
+    size_t n{0};
+    for (size_t idx = 0; idx < ids.size() - 1; idx++) {
+        auto current = ids[idx];
+        auto next = ids[idx + 1];
+        while ((n + next.idx) % next.id != 0) n += inc;
+        inc = inc * next.id;
+    }
+    fmt::print("{}\n", n);
 
     return 0;
 }
