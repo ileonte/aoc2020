@@ -237,6 +237,12 @@ namespace aoc {
         return r << final_shift;
     }
 
+    template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+    static inline T set_bit(T n, size_t shift, bool on_off) {
+        auto mask = (T(1) << shift);
+        return on_off ? (n | mask) : (n & ~mask);
+    }
+
     template <typename Callable, typename... Args>
     inline std::chrono::nanoseconds time_call(const Callable& f, Args... args)
     {
@@ -271,6 +277,20 @@ namespace aoc {
             }
         }
         return ret;
+    }
+
+    template <typename T>
+    inline bool from_chars(std::string_view sv, T& value, int base = 10) {
+        auto rc = std::from_chars(sv.begin(), sv.end(), value, base);
+        return rc.ptr = sv.end();
+    }
+
+    template <typename T>
+    inline std::optional<T> from_chars(std::string_view sv, int base = 10) {
+        T ret{};
+        auto rc = std::from_chars(sv.begin(), sv.end(), ret, base);
+        if (rc.ptr == sv.end()) return ret;
+        return std::nullopt;
     }
 }
 
