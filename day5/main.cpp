@@ -1,15 +1,10 @@
 #include <aoc.h>
 
-static inline size_t set_bit(size_t n, size_t shift, bool on_off) {
-    size_t mask = 1 << shift;
-    return on_off ?  (n | mask) : (n & ~mask);
-}
-
 template <char upper_half>
 static inline size_t convert(std::string_view sv) {
     size_t ret{0};
     for (size_t i = 0; i < sv.size(); i++)
-        ret = set_bit(ret, sv.size() - i - 1, sv.at(i) == upper_half);
+        ret = aoc::set_bit(ret, sv.size() - i - 1, sv.at(i) == upper_half);
     return ret;
 }
 
