@@ -16,7 +16,7 @@ struct History {
         return history_.size();
     }
 
-    inline uint32_t add(size_t number, uint32_t turn) {
+    inline uint32_t add(uint32_t number, uint32_t turn) {
         auto [it, inserted] = history_.insert({number, {}});
         last_said = &it->second;
         if (inserted) {
@@ -32,7 +32,7 @@ struct History {
     }
 
     inline uint32_t compute(uint32_t turn, uint32_t target_turn) {
-        auto next_number{last_said->appearances == 1 ? size_t(0) : turn - 1 - last_said->prev_turn};
+        auto next_number{last_said->appearances == 1 ? uint32_t(0) : turn - 1 - last_said->prev_turn};
         while (turn < target_turn) {
             auto tmp = add(next_number, turn);
             next_number = tmp;
