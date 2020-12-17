@@ -29,6 +29,23 @@
 #endif
 
 namespace fmt {
+    template <typename T, size_t N>
+    struct formatter<std::array<T, N>> {
+        template <typename ParseContext>
+        constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
+
+        template <typename FormatContext>
+        auto format(const std::array<T, N>& a, FormatContext &ctx) {
+            format_to(ctx.out(), "[");
+            if (a.size() > 0) {
+                format_to(ctx.out(), "{}", a.at(0));
+                for (auto i = 1; i < a.size(); i++)
+                    format_to(ctx.out(), ", {}", a.at(i));
+            }
+            return format_to(ctx.out(), "]");
+        }
+    };
+
     template <typename T>
     struct formatter<std::vector<T>> {
         template <typename ParseContext>
