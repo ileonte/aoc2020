@@ -273,6 +273,10 @@ namespace aoc {
         return std::string_view(r.first, r.length());
     }
 
+    inline std::string_view to_sv(const std::string& s) {
+        return std::string_view(s);
+    }
+
     inline std::vector<std::string_view>
     str_split(std::string_view the_string, const std::regex& re,
               size_t max_splits = std::numeric_limits<size_t>::max())
