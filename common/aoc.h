@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdint>
 #include <vector>
+#include <list>
 #include <set>
 #include <unordered_set>
 #include <map>
@@ -152,6 +153,26 @@ namespace fmt {
             return format_to(ctx.out(), "{{{}, {}}}", v.first, v.second);
         }
     };
+
+    template <typename T>
+    struct formatter<std::list<T>> {
+        template <typename ParseContext>
+        constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
+
+        template <typename FormatContext>
+        auto format(const std::list<T>& l, FormatContext &ctx) {
+            format_to(ctx.out(), "[");
+            if (l.size() > 0) {
+                auto it = l.begin();
+                format_to(ctx.out(), "{}", *it);
+                for (auto i = 1; i < l.size(); i++) {
+                    it++;
+                    format_to(ctx.out(), ", {}", *it);
+                }
+            }
+            return format_to(ctx.out(), "]");
+        }
+    };
 }
 
 namespace aoc {
@@ -171,7 +192,6 @@ namespace aoc {
             size_t s2 = std::hash<T2>{}(t2);
             return s1 ^ s2 + 0x9e3779b9 + (s1 << 6) + (s1 >> 2);
         }
-
     }
     template <typename T, typename... Ts>
     inline constexpr size_t combine_hashes(const T& s1, const Ts&... s2) {
@@ -179,7 +199,14 @@ namespace aoc {
     }
     template <typename T, typename... Ts>
     inline constexpr size_t hash(const T& t, const Ts& ...ts) {
-        return hash(t, detail::hash(ts)...);
+        return combine_hashes(t, detail::hash(ts)...);
+    }
+
+    template <typename IT>
+    inline IT advance(const IT& it, size_t n = 1) {
+        auto ret{it};
+        std::advance(ret, n);
+        return ret;
     }
 
     inline std::string_view trim(std::string_view sv) {
