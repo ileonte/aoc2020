@@ -340,6 +340,11 @@ namespace aoc {
         if (rc.ptr == sv.end()) return ret;
         return std::nullopt;
     }
+
+    template <typename T>
+    inline constexpr std::pair<T, T> numeric_limits() {
+        return std::make_pair(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+    }
 }
 
 namespace aoc::detail::defer {
