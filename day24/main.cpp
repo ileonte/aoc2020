@@ -1,8 +1,9 @@
 #include <aoc.h>
 
 struct Delta {
-    int32_t dx{0};
-    int32_t dy{0};
+    using int_type = int16_t;
+    int_type dx{0};
+    int_type dy{0};
 };
 
 static constexpr const Delta SE{ 1,  1};
@@ -13,16 +14,20 @@ static constexpr const Delta NE{ 1, -1};
 static constexpr const Delta  E{ 2,  0};
 
 struct Position {
+    using bigint_type = int32_t;
+    using int_type = Delta::int_type;
+
     union {
         struct {
-            int32_t x;
-            int32_t y;
+            int_type x;
+            int_type y;
         };
-        uint64_t _v;
+        bigint_type _v;
     };
 
     Position() : x(0), y(0) {}
-    Position(int ix, int iy) : x(ix), y(iy) {}
+    Position(int_type ix, int_type iy) : x(ix), y(iy) {}
+    Position(bigint_type iv) : _v(iv) {}
     Position(const Position& other) : _v(other._v) {}
     Position(Position&& other) : _v(other._v) {}
     Position& operator=(const Position& other) {
@@ -57,17 +62,16 @@ struct Position {
         return ret;
     }
 
-    inline bool operator<(Position other) const {
-        return _v < other._v;
-    }
     inline bool operator==(Position other) const {
         return _v == other._v;
     }
 };
+static_assert(sizeof(Position) == sizeof(Position::bigint_type));
+
 namespace std {
-    template <> struct hash<Position> {
-        size_t operator()(Position const& p) const noexcept {
-            return std::hash<decltype(p._v)>()(p._v);
+    template<> struct hash<Position> {
+        inline size_t operator()(Position p) const noexcept {
+            return p._v;
         }
     };
 }
@@ -138,10 +142,11 @@ int main() {
     std::unordered_set<Position> black_tiles{};
     std::vector<Delta> moves{};
     std::string line{};
-    auto minx{std::numeric_limits<int>::max()}, maxx{std::numeric_limits<int>::min()};
-    auto miny{std::numeric_limits<int>::max()}, maxy{std::numeric_limits<int>::min()};
+    auto [maxx, minx] = aoc::numeric_limits<Delta::int_type>();
+    auto [maxy, miny] = aoc::numeric_limits<Delta::int_type>();
 
-    moves.reserve(128);
+    line.reserve(256);
+    moves.reserve(256);
 
     while (std::getline(std::cin, line)) {
         if (!parse_movements(aoc::trim(line), moves)) return 1;
@@ -157,19 +162,15 @@ int main() {
     auto current = std::unordered_set<Position>(black_tiles);
     auto next = std::unordered_set<Position>();
     for (size_t day = 0; day < 100; day++) {
-        auto mx{std::numeric_limits<int>::max()}, Mx{std::numeric_limits<int>::min()};
-        auto my{std::numeric_limits<int>::max()}, My{std::numeric_limits<int>::min()};
+        auto [Mx, mx] = aoc::numeric_limits<Delta::int_type>();
+        auto [My, my] = aoc::numeric_limits<Delta::int_type>();
 
         for (int y = miny - 1; y < maxy + 2; y++) {
             for (int x = minx - 1; x < maxx + 2; x++) {
                 auto p = Position(x, y);
                 auto n = count_black_neighbours(current, p);
-                auto i = false;
-                if (current.contains(p)) {
-                    if (n == 1 || n == 2) i = true;
-                } else {
-                    if (n == 2) i = true;
-                }
+                auto is_black = current.contains(p);
+                auto i = ((is_black && (n == 1 || n == 2)) || (!is_black && (n == 2)));
                 if (i) {
                     next.insert(p);
                     mx = std::min(mx, p.x); Mx = std::max(Mx, p.x);
