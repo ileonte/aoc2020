@@ -345,6 +345,10 @@ namespace aoc {
     inline constexpr std::pair<T, T> numeric_limits() {
         return std::make_pair(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
     }
+
+    inline auto accumulate(auto& c, auto init, auto op) {
+        return std::accumulate(std::begin(c), std::end(c), init, op);
+    }
 }
 
 namespace aoc::detail::defer {
