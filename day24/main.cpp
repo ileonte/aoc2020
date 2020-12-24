@@ -60,7 +60,17 @@ struct Position {
     inline bool operator<(Position other) const {
         return _v < other._v;
     }
+    inline bool operator==(Position other) const {
+        return _v == other._v;
+    }
 };
+namespace std {
+    template <> struct hash<Position> {
+        size_t operator()(Position const& p) const noexcept {
+            return std::hash<decltype(p._v)>()(p._v);
+        }
+    };
+}
 
 static inline bool parse_movements(std::string_view line, std::vector<Delta>& moves) {
     auto* it = line.begin();
@@ -118,14 +128,14 @@ parse_error:
     return false;
 }
 
-inline size_t count_black_neighbours(const std::set<Position>& black_tiles, Position p) {
+inline size_t count_black_neighbours(const std::unordered_set<Position>& black_tiles, Position p) {
     size_t ret{0};
     for (auto n : p.neighbours()) ret += black_tiles.contains(n);
     return ret;
 }
 
 int main() {
-    std::set<Position> black_tiles{};
+    std::unordered_set<Position> black_tiles{};
     std::vector<Delta> moves{};
     std::string line{};
     auto minx{std::numeric_limits<int>::max()}, maxx{std::numeric_limits<int>::min()};
@@ -144,8 +154,8 @@ int main() {
     }
     fmt::print("{}\n", black_tiles.size());
 
-    auto current = std::set<Position>(black_tiles);
-    auto next = std::set<Position>();
+    auto current = std::unordered_set<Position>(black_tiles);
+    auto next = std::unordered_set<Position>();
     for (size_t day = 0; day < 100; day++) {
         auto mx{std::numeric_limits<int>::max()}, Mx{std::numeric_limits<int>::min()};
         auto my{std::numeric_limits<int>::max()}, My{std::numeric_limits<int>::min()};
