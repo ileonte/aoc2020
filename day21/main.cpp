@@ -9,13 +9,14 @@ std::ostream& operator<<(std::ostream& out, const IngredientInfo& info) {
     return out << "{\"" << info.name << "\", \"" << info.allergen << "\", " << info.appearances << "}";
 }
 
-using Ingredients = std::vector<std::string_view>;
-using IngredientStore = std::unordered_set<std::string_view>;
-using AllergenStore = std::unordered_map<std::string_view, IngredientStore>;
+using IngredientNames = std::vector<std::string_view>;
+using UniqueIngredients = std::unordered_set<std::string_view>;
+using AllergenStore = std::unordered_map<std::string_view, UniqueIngredients>;
+using IngredientStore = std::vector<IngredientInfo>;
 using IngredientMap = std::unordered_map<std::string_view, IngredientInfo>;
 
-static inline IngredientStore unique_ingredients(const IngredientStore& existing, const Ingredients& additions) noexcept {
-    IngredientStore ret{};
+static inline UniqueIngredients unique_ingredients(const UniqueIngredients& existing, const IngredientNames& additions) noexcept {
+    UniqueIngredients ret{};
     for (auto& i : additions) {
         if (existing.contains(i)) ret.insert(i);
     }
@@ -45,7 +46,7 @@ static inline bool parse_input(const std::vector<std::string>& data_store, Ingre
         }
 
         for (auto a : allergens) {
-            auto [it, added] = allergen_store.insert({a, IngredientStore(ingredients.begin(), ingredients.end())});
+            auto [it, added] = allergen_store.insert({a, UniqueIngredients(ingredients.begin(), ingredients.end())});
             if (!added) it->second = unique_ingredients(it->second, ingredients);
         }
     }
@@ -93,7 +94,7 @@ int main() {
             return acc + (info.second.allergen.empty() ? info.second.appearances : 0);
         }));
 
-    std::vector<IngredientInfo> dangerous_ingredients{};
+    IngredientStore dangerous_ingredients{};
     for (auto& it : ingredients) {
         if (it.second.allergen.empty()) continue;
         dangerous_ingredients.push_back(it.second);
