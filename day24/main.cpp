@@ -25,33 +25,32 @@ struct Position {
         bigint_type _v;
     };
 
-    Position() : x(0), y(0) {}
-    Position(int_type ix, int_type iy) : x(ix), y(iy) {}
-    Position(bigint_type iv) : _v(iv) {}
-    Position(const Position& other) : _v(other._v) {}
-    Position(Position&& other) : _v(other._v) {}
-    Position& operator=(const Position& other) {
+    Position() noexcept : x(0), y(0) {}
+    Position(int_type ix, int_type iy)  noexcept : x(ix), y(iy) {}
+    Position(bigint_type iv) noexcept : _v(iv) {}
+    Position(const Position& other) noexcept : _v(other._v) {}
+    Position(Position&& other) noexcept : _v(other._v) {}
+    Position& operator=(const Position& other) noexcept {
         _v = other._v;
         return *this;
     }
-    Position& operator=(Position&& other) {
+    Position& operator=(Position&& other) noexcept {
         _v = other._v;
         return *this;
     }
 
-    inline Position& apply_moves(const std::vector<Delta>& moves) {
-        for (auto m : moves) {
-            x += m.dx;
-            y += m.dy;
-        }
+    inline Position& apply_moves(const std::vector<Delta>& moves) noexcept {
+        *this = aoc::accumulate(moves, *this, [](Position acc, const Delta& d) -> Position {
+            return acc + d;
+        });
         return *this;
     }
 
-    inline Position operator+(Delta d) const {
+    inline Position operator+(Delta d) const noexcept {
         return Position(x + d.dx, y + d.dy);
     }
 
-    inline const std::array<Position, 6> neighbours() const {
+    inline const std::array<Position, 6> neighbours() const noexcept {
         std::array<Position, 6> ret{};
         ret[0] = *this + SE;
         ret[1] = *this + SW;
@@ -62,7 +61,7 @@ struct Position {
         return ret;
     }
 
-    inline bool operator==(Position other) const {
+    inline bool operator==(Position other) const noexcept {
         return _v == other._v;
     }
 };
@@ -76,7 +75,7 @@ namespace std {
     };
 }
 
-static inline bool parse_movements(std::string_view line, std::vector<Delta>& moves) {
+static inline bool parse_movements(std::string_view line, std::vector<Delta>& moves) noexcept {
     auto* it = line.begin();
 
     moves.clear();
@@ -132,12 +131,6 @@ parse_error:
     return false;
 }
 
-inline size_t count_black_neighbours(const std::unordered_set<Position>& black_tiles, Position p) {
-    size_t ret{0};
-    for (auto n : p.neighbours()) ret += black_tiles.contains(n);
-    return ret;
-}
-
 int main() {
     std::unordered_set<Position> black_tiles{};
     std::vector<Delta> moves{};
@@ -168,7 +161,9 @@ int main() {
         for (int y = miny - 1; y < maxy + 2; y++) {
             for (int x = minx - 1; x < maxx + 2; x++) {
                 auto p = Position(x, y);
-                auto n = count_black_neighbours(current, p);
+                auto n = aoc::accumulate(p.neighbours(), 0, [&current](int acc, const Position& p) -> int {
+                    return acc + current.contains(p);
+                });
                 auto is_black = current.contains(p);
                 auto i = ((is_black && (n == 1 || n == 2)) || (!is_black && (n == 2)));
                 if (i) {
