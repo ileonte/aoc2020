@@ -349,6 +349,11 @@ namespace aoc {
     inline auto accumulate(auto& c, auto init, auto op) {
         return std::accumulate(std::begin(c), std::end(c), init, op);
     }
+
+    template <typename T, size_t N>
+    inline constexpr size_t member_count(const T (&)[N]) noexcept {
+        return N;
+    }
 }
 
 namespace aoc::detail::defer {
